@@ -3,11 +3,13 @@ from utils import read_data
 
 
 class PSO:
-    def __init__(self, path, max_iter, population_num, w):
+    def __init__(self, path, max_iter, population_num, w, alpha, beta):
         self.path = path
         self.max_iter = max_iter
         self.population_num = population_num
         self.w = w
+        self.alpha = alpha
+        self.beta = beta
 
         # 读取城市数据
         self.cities = read_data(self.path)
@@ -18,7 +20,10 @@ class PSO:
         self.population, self.list_v = self.init_population()
 
     def solve(self):
-        pass
+        pbest = np.empty(self.population_num)
+        for i in range(self.population_num):
+            pbest[i] = self.evaluate(self.population[i])
+        gbest = np.min(pbest)
 
     def cal_dist(self):
         mat1 = np.expand_dims(self.cities, 0)
@@ -27,11 +32,14 @@ class PSO:
         return dist
 
     def init_population(self):
+        origin = np.arange(self.city_num)
         populations = np.zeros((self.population_num, self.city_num))
-        list_v = np.zeros((self.population_num, 2))
+        list_v = np.zeros((self.population_num, self.city_num))
         for i in range(self.population_num):
             populations[i] = np.random.choice(self.city_num)
-            list_v[i] = np.random.choice(self.city_num, 2, replace=False)
+            for j in range(self.city_num):
+                if origin[j] != populations[i, j]:
+                    list_v[i, j] = j
         return populations, list_v
 
     def evaluate(self, sequence):
@@ -43,5 +51,5 @@ class PSO:
 
 
 if __name__ == '__main__':
-    pso = PSO('dataset.txt', 100, 50, 0.9)
+    pso = PSO('dataset.txt', 100, 50, 0.9, 0.5, 0.5)
     pso.solve()
