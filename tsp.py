@@ -24,6 +24,19 @@ class PSO:
         for i in range(self.population_num):
             pbest[i] = self.evaluate(self.population[i])
         gbest = np.min(pbest)
+        gv = self.population[np.argmin(pbest)]
+
+        for i in range(self.max_iter):
+            for j in range(self.population_num):
+                x, y = np.random.choice(self.city_num, 2, replace=False)
+                temp = self.population[j]
+                temp[x], temp[y] = temp[y], temp[x]
+                dist = self.evaluate(temp)
+
+                if dist < pbest[j]:
+                    pbest[j] = dist
+                    self.population[j] = temp
+
 
     def cal_dist(self):
         mat1 = np.expand_dims(self.cities, 0)
